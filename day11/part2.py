@@ -8,7 +8,6 @@ class Monkey:
     test_divisor: int = None
     yes_monkey: int
     no_monkey: int
-    # other_monkeys: List['Monkey'] = []
 
     def __init__(self, starting_items, operation, test_divisor, yes_monkey, no_monkey):
         self.items = starting_items
@@ -26,11 +25,13 @@ class Monkey:
             item = self.items.pop(0)
             new = eval(self.operation, {'old': item})
             self.items_inspected += 1
-            new = sum([int(i) for i in str(new)])
+            target = monkeys[self.no_monkey]
+            to_send = sum([int(i) for i in str(new)])
             if self.test(new):
-                monkeys[self.yes_monkey].items.append(new)
-            else:
-                monkeys[self.no_monkey].items.append(new)
+                to_send = self.test_divisor
+                target = monkeys[self.yes_monkey]
+
+            target.items.append(to_send)
 
 
 def create_monkey(instructions: str) -> Monkey:
@@ -61,9 +62,11 @@ def main(in_file):
             monkeys.append(create_monkey(current))
             current = ''
 
-    rounds = 1000
+    rounds = 10000
     for i in range(rounds):
         print(f'Round {i} of {rounds}', end='\r')
+        if i == 20:
+            print([m.items_inspected for m in monkeys])
         for m in monkeys:
             m.inspect_items(monkeys)
 
