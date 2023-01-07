@@ -49,24 +49,34 @@ def main(in_file):
 
     # show_map(sensors, beacons)
 
-    covered_in_line = defaultdict(set)
+    covered_in_line = {}
 
     for a, b in combos.items():
         dist = manhattan_distance(a, b)
         starting_line = a[1]
         starting_col = a[0]
-        covered = list(range(starting_col - dist, starting_col + dist))
-        covered_in_line[starting_line].update(set(covered))
-        for dist in range(1, dist):
-            covered = covered[1:-1]
-            up = starting_line - dist
-            down = starting_line + dist
-            covered_in_line[up] = set(covered)
-            covered_in_line[down] = set(covered)
+        start, end = starting_col - dist, starting_col + dist
+        for i in range(1, dist):
+            start += 1
+            end -= 1
+            up = starting_line - i
+            down = starting_line + i
+            if up not in covered_in_line:
+                covered_in_line[up] = {'start': start, 'end': end}
+            if down not in covered_in_line:
+                covered_in_line[down] = {'start': start, 'end': end}
 
+            covered_in_line[up] = {
+                'start': min(start, covered_in_line[up]['start']),
+                'end': max(end, covered_in_line[up]['end'])
+            }
+            covered_in_line[down] = {
+                'start': min(start, covered_in_line[down]['start']),
+                'end': max(end, covered_in_line[down]['end'])
+            }
 
-
-    # return len(covered_in_line[2000000])
+    relevant_line = 2000000
+    return covered_in_line[relevant_line]['end'] - covered_in_line[relevant_line]['start']
 
 
 if __name__ == '__main__':
